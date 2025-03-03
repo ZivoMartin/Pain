@@ -1,64 +1,21 @@
+%include "src/header.asm"
+%include "src/global.asm"
+
+%include "src/connect.asm"
+%include "src/send.asm"
+%include "src/next_id.asm"
+%include "src/open_font.asm"
+%include "src/create_gc.asm"
+%include "src/create_window.asm"
+%include "src/map_window.asm"
+
 section .rodata
 sun_path: db "/tmp/.X11-unix/X0", 0
 static sun_path:data
 
 section .text
 
-%define SYSCALL_EXIT 60
-%define AF_UNIX 1
-%define SOCK_STREAM 1
-%define SYSCALL_SOCKET 41
-%define SYSCALL_CONNECT 42
-
 global _start:
-
-; Create a UNIX domain socket and connect to the X11 server.
-; @returns The socket file descriptor.
-x11_connect_to_server:
-static x11_connect_to_server:function
-  push rbp
-  mov rbp, rsp
-
-  ; Open a Unix socket: socket(2).
-  mov rax, SYSCALL_SOCKET
-  mov rdi, AF_UNIX ; Unix socket.
-  mov rsi, SOCK_STREAM ; Stream oriented.
-  mov rdx, 0 ; Automatic protocol.
-  syscall
-
-  cmp rax, 0
-  jle die
-
-  mov rdi, rax ; Store socket fd in `rdi` for the remainder of the function.
-
-  sub rsp, 112 ; Store struct sockaddr_un on the stack.
-  mov WORD [rsp], AF_UNIX ; Set sockaddr_un.sun_family to AF_UNIX
-
-  ; Fill sockaddr_un.sun_path with: "/tmp/.X11-unix/X0".
-  lea rsi, sun_path
-  mov r12, rdi ; Save the socket file descriptor in `rdi` in `r12`.
-  lea rdi, [rsp + 2]
-  cld ; Move forward
-  mov ecx, 19 ; Length is 19 with the null terminator.
-  rep movsb ; Copy.
-
-  ; Connect to the server: connect(2).
-  mov rax, SYSCALL_CONNECT
-  mov rdi, r12
-  lea rsi, [rsp]
-
-  %define SIZEOF_SOCKADDR_UN 2+108
-  mov rdx, SIZEOF_SOCKADDR_UN
-  syscall
-
-  cmp rax, 0
-  jne die
-
-  mov rax, rdi ; Return the socket fd.
-
-  add rsp, 112
-  pop rbp
-  ret
 
 die:
   mov rax, SYSCALL_EXIT
@@ -67,8 +24,53 @@ die:
 
 _start:
 global _start:function
-  call x11_connect_to_server
+  call connect_to_server
+  mov r15, rax ; Store the socket file descriptor in r15.
 
+  mov rdi, rax
+  call send
+
+  mov r12d, eax ; Store the window root id in r12.
+
+  call next_id
+  mov r13d, eax ; Store the gc_id in r13.
+
+  call next_id
+  mov r14d, eax ; Store the font_id in r14.
+
+  mov rdi, r15
+  mov esi, r14d
+  call open_font
+
+
+  mov rdi, r15
+  mov esi, r13d
+  mov edx, r12d
+  mov ecx, r14d
+  call create_gc
+
+  call next_id
+
+  mov ebx, eax ; Store the window id in ebx.
+
+  mov rdi, r15 ; socket fd
+  mov esi, eax
+  mov edx, r12d
+  mov ecx, [root_visual_id]
+  mov r8d, 200 | (200 << 16) ; x and y are 200
+  %define WINDOW_W 800
+  %define WINDOW_H 600
+  mov r9d, WINDOW_W | (WINDOW_H << 16)
+  call create_window
+
+  mov rdi, r15 ; socket fd
+  mov esi, ebx
+  call map_window
+
+loop:
+jmp loop
+
+  ; The end.
   mov rax, SYSCALL_EXIT
   mov rdi, 0
   syscall
