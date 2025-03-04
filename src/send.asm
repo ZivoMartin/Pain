@@ -60,7 +60,7 @@ movzx rcx, cx                   ; Filling rcx with zero so the length is clean
     ;; Then we wanna skip formats, it is some information on how the images datas are formating
     ;; For exemple how to interpret pixels
 mov al, BYTE [rsp + 21]         ; There is multiple format, the number of format is now stored in ax
-movzx rax, ax                   ; Zero-extends `al` (8-bit) into full `rax`
+movzx rax, al                   ; Zero-extends `al` (8-bit) into full `rax`
 imul rax, 8                     ; As the size of a single format is 8, we are getting the size of all format like this
 
 add rdi, 32                     ; Skip the connection setup (id_base, id_mask, vendor length etc...)

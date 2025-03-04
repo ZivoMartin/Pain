@@ -6,7 +6,7 @@
 ; @param r8d Packed x and y.
 ; @param r9d Packed w and h.
 create_window:
-static x11_create_window:function
+static create_window:function
 push rbp
 mov rbp, rsp
 

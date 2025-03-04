@@ -5,3 +5,5 @@
 %define SYSCALL_CONNECT 42
 %define SYSCALL_WRITE 1
 %define SYSCALL_READ 0
+%define SYSCALL_FCNTL 72
+%define SYSCALL_POLL 7
