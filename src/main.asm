@@ -1,5 +1,6 @@
 %include "src/header.asm"
 %include "src/global.asm"
+%include "src/macros.asm"
 
 %include "src/connect.asm"
 %include "src/send.asm"
@@ -14,10 +15,14 @@
 
 section .rodata
 
+_ascii db 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, " !", 34, "#$%&", 39, "()*+,-./0123456789:", 59, "<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+_newline: db 10
+
+
 sun_path: db "/tmp/.X11-unix/X0", 0
 static sun_path:data
 
-hello_world: db "Hello, world!"
+hello_world: db "Hello, world!", 10, 0
 static hello_world:data
 
 section .text

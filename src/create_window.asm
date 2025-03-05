@@ -12,8 +12,12 @@ mov rbp, rsp
 
 %define OP_REQ_CREATE_WINDOW 0x01 ; Op code to create a window
 %define FLAG_WIN_BG_COLOR 0x00000002 ; Flag to indicate that we are gonna use bg color
-%define EVENT_FLAG_KEY_RELEASE 0x0002 ; We are telling to X11 to send us an event each time a key is released
-%define EVENT_FLAG_EXPOSURE 0x8000    ; We are telling to X11 to send us an event each time a we need to redraw the window (if we are resizing it for instance)
+%define X11_EVENT_MASK_BUTTON_PRESS   0x00000004  ; ButtonPressMask
+%define X11_EVENT_MASK_BUTTON_RELEASE 0x00000008  ; ButtonReleaseMask
+%define X11_EVENT_MASK_EXPOSURE       0x00008000  ; Expose event
+%define X11_EVENT_KEY_RELEASE 0x0002 ; We are telling to X11 to send us an event each time a key is released
+%define X11_EVENT_KEY_PRESS 0x0001 ; We are telling to X11 to send us an event each time a key is released
+
 %define FLAG_WIN_EVENT 0x00000800   ; This enables event processing for the window
 
 %define CREATE_WINDOW_FLAG_COUNT 2 ; Total number of flag
@@ -32,8 +36,7 @@ mov DWORD [rsp + 5*4], CREATE_WINDOW_GROUP | (CREATE_WINDOW_BORDER << 16) ; Wind
 mov DWORD [rsp + 6*4], ecx                                                ; root visual id
 mov DWORD [rsp + 7*4], FLAG_WIN_BG_COLOR | FLAG_WIN_EVENT                 ; Flags
 mov DWORD [rsp + 8*4], 0                                                  ; Unused flags
-mov DWORD [rsp + 9*4], EVENT_FLAG_KEY_RELEASE | EVENT_FLAG_EXPOSURE ; Explosure flag
-
+mov DWORD [rsp + 9*4], X11_EVENT_MASK_BUTTON_PRESS | X11_EVENT_MASK_BUTTON_RELEASE | X11_EVENT_MASK_EXPOSURE | X11_EVENT_KEY_RELEASE | X11_EVENT_KEY_PRESS
 
 mov rax, SYSCALL_WRITE
 mov rdi, rdi
