@@ -7,3 +7,5 @@
 %define SYSCALL_READ 0
 %define SYSCALL_FCNTL 72
 %define SYSCALL_POLL 7
+%define WINDOW_W 800
+%define WINDOW_H 600

@@ -1,27 +1,14 @@
-    ;; Read the X11 server reply.
-    ;; @param rsi address to store the data
-x11_read_reply:
-static x11_read_reply:function
-push rbp
-mov rbp, rsp
-
-
-;; As x11 messages are rarely longer than 32 bytes, we are reading only 32 bytes
-mov rax, SYSCALL_READ
-mov rdi, rdi
-mov rdx, 32
-syscall
-
-cmp rax, 1
-jle die
-
-pop rbp
-
-ret
-
-
 %define KEYPRESS 2
 %define MOUSEPRESS 4
+
+    ;; This macro changes one element of the bit set to the one gicven inparameter
+    ;; @param rax x
+    ;; @param rax y
+%macro dn 3
+
+mov [rsp + 64 + WINDOW_W * %2],
+
+%end
 
 ; Poll indefinitely messages from the X11 server with poll(2).
 ; @param rdi The socket file descriptor.
@@ -31,6 +18,11 @@ event_loop:
 static poll_messages:function
 push rbp
 mov rbp, rsp
+
+mov r15, WINDOW_W
+mov rax, WINDOW_H
+imul r15, rax
+add r15, 64
 
 sub rsp, 64
 
@@ -65,15 +57,15 @@ je die
 cmp DWORD [rsp + 2*4], POLLHUP
 je die
 
+;; As x11 messages are rarely longer than 32 bytes, we are reading only 32 bytes
+mov rax, SYSCALL_READ
 mov rdi, [rsp + 0*4]
 lea rsi, [rsp + 32]
-call x11_read_reply
+mov rdx, 32
+syscall
+
 mov al, BYTE [rsp + 32]
 movzx rax, al
-
-push rax
-dn rax
-pop rax
 
 %define X11_EVENT_EXPOSURE 12
 cmp eax, X11_EVENT_EXPOSURE
@@ -102,11 +94,8 @@ shl r9d, 16
 or r9d, 100 ; y
 call x11_draw_text
 
-
-
 jmp .loop
 
-
-add rsp, 64
+add rsp, 80
 pop rbp
 ret

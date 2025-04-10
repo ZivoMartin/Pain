@@ -69,8 +69,7 @@ mov esi, eax
 mov edx, r12d
 mov ecx, [root_visual_id]
 mov r8d, 200 | (200 << 16) ; x and y are 200
-%define WINDOW_W 800
-%define WINDOW_H 600
+
 mov r9d, WINDOW_W | (WINDOW_H << 16)
 call create_window
 

@@ -36,7 +36,7 @@ mov DWORD [rsp + 5*4], CREATE_WINDOW_GROUP | (CREATE_WINDOW_BORDER << 16) ; Wind
 mov DWORD [rsp + 6*4], ecx                                                ; root visual id
 mov DWORD [rsp + 7*4], FLAG_WIN_BG_COLOR | FLAG_WIN_EVENT                 ; Flags
 mov DWORD [rsp + 8*4], 0                                                  ; Unused flags
-mov DWORD [rsp + 9*4], X11_EVENT_MASK_BUTTON_PRESS | X11_EVENT_MASK_BUTTON_RELEASE | X11_EVENT_MASK_EXPOSURE | X11_EVENT_KEY_RELEASE | X11_EVENT_KEY_PRESS
+mov DWORD [rsp + 9*4], X11_EVENT_MASK_BUTTON_PRESS | X11_EVENT_MASK_EXPOSURE | X11_EVENT_KEY_RELEASE | X11_EVENT_KEY_PRESS
 
 mov rax, SYSCALL_WRITE
 mov rdi, rdi

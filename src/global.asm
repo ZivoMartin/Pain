@@ -1,5 +1,4 @@
 section .data
-
 id:  dd 0
 static id:data
 
